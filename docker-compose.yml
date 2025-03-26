@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  reranker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_URL=http://127.0.0.1:11434
+      - RERANK_MODEL=gemma3:1b
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - ollama-network
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    networks:
+      - ollama-network
+
+networks:
+  ollama-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+
+volumes:
+  ollama_data:

@@ -1,0 +1,6 @@
+fastapi
+requests
+sentence-transformers
+torch
+transformers
+uvicorn
