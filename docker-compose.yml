@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   reranker:
     image: craftslab/reranker:latest
