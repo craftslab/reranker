@@ -91,14 +91,41 @@ async def rerank(request: Request):
     except (ValueError, TypeError):
         top_n = len(documents)
 
-    current_model = data.get("model", ollama_model)
-    sorted_results = rerank_with_ollama(query, documents, current_model, ollama_url)
+    parsed_documents = []
 
+    if documents and isinstance(documents[0], dict):
+        has_indices = "index" in documents[0]
+        if has_indices:
+            parsed_documents = [(doc.get("index", i), doc.get("text", "")) for i, doc in enumerate(documents)]
+        else:
+            for i, doc in enumerate(documents):
+                if "content" in doc:
+                    parsed_documents.append((i, doc["content"]))
+                elif "text" in doc:
+                    parsed_documents.append((i, doc["text"]))
+                else:
+                    parsed_documents.append((i, str(doc)))
+    else:
+        parsed_documents = [(i, doc) for i, doc in enumerate(documents)]
+
+    doc_texts = [doc_text for _, doc_text in parsed_documents]
+
+    current_model = data.get("model", None)
+    results = rerank_with_ollama(query, doc_texts, current_model, ollama_url)
+
+    for i, result in enumerate(results):
+        result["index"] = parsed_documents[i][0]
+
+    sorted_results = sorted(results, key=lambda x: x["score"], reverse=True)
     top_results = sorted_results[:top_n]
 
     return {
         "results": [
-            {"document": item["document"], "relevance_score": item["score"]}
+            {
+                "index": item["index"],
+                "document": item["document"],
+                "relevance_score": float(item["score"])
+            }
             for item in top_results
         ],
         "model_used": current_model,
