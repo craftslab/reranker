@@ -2,9 +2,7 @@ version: '3'
 
 services:
   reranker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: craftslab/reranker:latest
     ports:
       - "8080:8080"
     environment:
