@@ -77,7 +77,7 @@ def rerank_with_ollama(query, documents, ollama_model, ollama_url):
     return sorted_results
 
 
-@app.post("/v1/rerank")
+@app.post("/rerank")
 async def rerank(request: Request):
     data = await request.json()
 
@@ -97,7 +97,10 @@ async def rerank(request: Request):
     top_results = sorted_results[:top_n]
 
     return {
-        "results": top_results,
+        "results": [
+            {"document": item["document"], "relevance_score": item["score"]}
+            for item in top_results
+        ],
         "model_used": current_model,
         "total_results": len(sorted_results),
         "returned_results": len(top_results)
