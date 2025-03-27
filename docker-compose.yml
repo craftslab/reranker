@@ -13,8 +13,7 @@ services:
     depends_on:
       - ollama
     restart: unless-stopped
-    networks:
-      - ollama-network
+    network_mode: host
 
   ollama:
     image: ollama/ollama:latest
@@ -23,14 +22,7 @@ services:
     ports:
       - "11434:11434"
     restart: unless-stopped
-    networks:
-      - ollama-network
-
-networks:
-  ollama-network:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+    network_mode: host
 
 volumes:
   ollama_data:

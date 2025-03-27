@@ -22,5 +22,6 @@ curl -X POST http://localhost:8080/v1/rerank \
 
 ## Reference
 
+- [bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3#usage)
 - [jina-reranker](https://jina.ai/reranker/)
 - [text-embeddings-inference](https://github.com/huggingface/text-embeddings-inference/blob/main/README.md)
