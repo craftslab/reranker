@@ -1,0 +1,23 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TIME_ZONE=Asia/Shanghai
+RUN apt update -y && \
+    apt install -y apt-transport-https ca-certificates curl git && \
+    apt install -y inetutils-ping net-tools openssh-server telnet tzdata unzip vim && \
+    ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone && \
+    echo "dash dash/sh boolean false" | debconf-set-selections && \
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+
+RUN apt update -y && \
+    apt install -y python3 python3-pip && \
+    pip3 install wheel && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY reranker.py .
+
+CMD ["python3", "reranker.py"]
